@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-incluster-client-go
+spec:
+  containers:
+  - name: incluster
+    image: duanjinyi/in-incluster:v1
+    imagePullPolicy: IfNotPresent
+

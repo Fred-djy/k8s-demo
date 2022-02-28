@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cloud
+  namespace: cloud
+  labels:
+    cloud: duanjinyi_cloud
+spec:
+  capacity:
+    storage: 500Mi
+  volumeMode: Filesystem
+  accessModes: ["ReadWriteMany"]
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: nfs
+  nfs:
+    path: /Users/duanjinyi/Desktop/脚本/pv/data
+    server: 192.168.19.134
