@@ -4,7 +4,5 @@ metadata:
   name: pod-example
 spec:
   containers:
-  - name: ubuntu
-    image: ubuntu:trusty
-    command: ["echo"]
-    args: ["Hello World"]
+  - name: nginx
+    image: nginx:latest

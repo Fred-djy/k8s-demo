@@ -1,0 +1,11 @@
+apiVersion: cs.handpay.cn/v1
+kind: Redis
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: example-redis
+spec:
+  schedule: "2021-11-17T10:12:00Z"
+  command: "echo redis crd!"
+  replicas: 3
+  phase: "Running"

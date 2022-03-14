@@ -1,4 +1,4 @@
-module informer
+module demo-informer
 
 go 1.17
 
