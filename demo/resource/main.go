@@ -27,6 +27,7 @@ var kubeconfig *string
 var name string
 var namespace string
 var kind string
+var method string
 
 func init() {
 	if home := homedir.HomeDir(); home != "" {
@@ -35,6 +36,7 @@ func init() {
 		kubeconfig = flag.String("kubeconfig", "", "kubeconfig file")
 	}
 
+	flag.StringVar(&method, "method", "create", "增删改查：create delete update search")
 	flag.StringVar(&name, "name", "demo-pod", "资源名字")
 	flag.StringVar(&kind, "kind", "Pod", "资源类型，例如：pod、deployment、daemonSet、job、crd")
 	flag.StringVar(&namespace, "namespace", "default", "命名空间")
@@ -54,7 +56,7 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		newPod(client)
+		newPod(client, method)
 		break
 	case "deployment":
 		// 使用clientSet也行，这里使用dynamic
@@ -62,16 +64,16 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		newDeployment(client)
+		newDeployment(client, method)
 		break
 	case "crd":
-		newCrd(config)
+		newCrd(config, method)
 	default:
 		break
 	}
 }
 
-func newCrd(config *rest.Config)  {
+func newCrd(config *rest.Config, method string) {
 	// 创建dynamic客户端
 	dynamicClient, err := dynamic.NewForConfig(config)
 	// 创建discovery客户端
@@ -105,7 +107,6 @@ spec:
 		return
 	}
 
-	fmt.Println("resourceMapper: ", resourceMapper)
 	var dr dynamic.ResourceInterface
 	if resourceMapper.Scope.Name() == meta.RESTScopeNameNamespace {
 		// 获取gvr对应的动态客户端
@@ -119,62 +120,80 @@ spec:
 		panic(fmt.Errorf("failed to get dr: %v", err))
 	}
 
-
 	crd := crd.Crd{
-		Dr: dr,
-		Obj: obj,
-		Name: name,
+		Dr:        dr,
+		Obj:       obj,
+		Name:      name,
 		Namespace: namespace,
 	}
 	if err != nil {
 		panic(fmt.Errorf("failed to get GVK: %v", err))
 	}
 
-	// 新增
-	crd.Create()
-
-	// 查询
-	crd.Get()
-
-	// 更新
-	crd.Update()
-
-	// 删除
-	crd.Delete()
+	switch method {
+	case "create":
+		crd.Create()
+		break
+	case "delete":
+		crd.Delete()
+	case "update":
+		// 更新
+		crd.Update()
+		break
+	case "search":
+		crd.Get()
+		break
+	}
 }
 
-func newPod(client *kubernetes.Clientset) {
-	// 创建namespace
-	createNamespace(client)
-
+func newPod(client *kubernetes.Clientset, method string) {
 	podObject := pod.Pod{
 		ClientSet: client,
 		PodName:   name,
 		Namespace: namespace,
 	}
 
-	// 删除pod
-	podObject.Delete()
+	switch method {
+	case "create":
+		podObject.Create()
+		break
+	case "delete":
+		podObject.Delete()
+	case "update":
+		// TODO
+		break
+	case "search":
+		// 查询pod
+		//_, err = clientset.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 
-	// 创建pod
-	podObject.Create()
-
-	// 查询pod
-	//_, err = clientset.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
-
-	// 查询podlist
-	podObject.GetList()
+		// 查询podlist
+		podObject.GetList()
+		break
+	}
 }
 
-func newDeployment(client dynamic.Interface)  {
+func newDeployment(client dynamic.Interface, method string) {
 	deploymentObject := deployment.Deployment{
-		Client: client,
-		Name:   name,
+		Client:    client,
+		Name:      name,
 		Namespace: namespace,
 	}
 
-	// 创建
-	deploymentObject.Create()
+	switch method {
+	case "create":
+		deploymentObject.Create()
+		break
+	case "delete":
+		// TODO
+		break
+	case "update":
+		// TODO
+		break
+	case "search":
+		// TODO
+		break
+	}
+
 }
 
 // 新建namespace

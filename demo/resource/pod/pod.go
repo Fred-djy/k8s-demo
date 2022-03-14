@@ -22,6 +22,8 @@ func (p *Pod) Delete(){
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println("pod: " + p.PodName + "已删除")
 }
 
 func (p *Pod) GetList() {
@@ -52,8 +54,11 @@ func (p *Pod) Create(){
 			},
 		},
 	}
-	_, err := p.ClientSet.CoreV1().Pods(p.Namespace).Create(context.Background(), &newPod, metav1.CreateOptions{})
+
+	obj, err := p.ClientSet.CoreV1().Pods(p.Namespace).Create(context.Background(), &newPod, metav1.CreateOptions{})
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	fmt.Println("pod: " + obj.GetName() + "已经创建")
 }
